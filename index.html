@@ -3,13 +3,446 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pipeline Schedule Tracker Test</title>
+    <title>Pipeline Schedule Tracker - Adani Krishnapatnam Port</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 18px;
+            color: #666;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Animation for notifications */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
 </head>
 <body>
-    <h1>Pipeline Schedule Tracker is Loading...</h1>
-    <p>If you see this message, the HTML file is working correctly.</p>
-    <script>
-        console.log("HTML file loaded successfully!");
+    <div id="root">
+        <div class="loading">
+            <div>Loading Pipeline Schedule Tracker...</div>
+        </div>
+    </div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Simple icons as SVG components
+        const Calendar = () => React.createElement('svg', { className: "w-4 h-4", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
+            React.createElement('rect', { x: 3, y: 4, width: 18, height: 18, rx: 2, ry: 2 }),
+            React.createElement('line', { x1: 16, y1: 2, x2: 16, y2: 6 }),
+            React.createElement('line', { x1: 8, y1: 2, x2: 8, y2: 6 }),
+            React.createElement('line', { x1: 3, y1: 10, x2: 21, y2: 10 })
+        );
+
+        const Clock = ({ className = "w-4 h-4" }) => React.createElement('svg', { className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
+            React.createElement('circle', { cx: 12, cy: 12, r: 10 }),
+            React.createElement('polyline', { points: "12,6 12,12 16,14" })
+        );
+
+        const Users = ({ className = "w-4 h-4" }) => React.createElement('svg', { className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
+            React.createElement('path', { d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" }),
+            React.createElement('circle', { cx: 9, cy: 7, r: 4 }),
+            React.createElement('path', { d: "M23 21v-2a4 4 0 0 0-3-3.87" }),
+            React.createElement('path', { d: "M16 3.13a4 4 0 0 1 0 7.75" })
+        );
+
+        const CheckCircle = ({ className = "w-4 h-4" }) => React.createElement('svg', { className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
+            React.createElement('path', { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
+            React.createElement('polyline', { points: "22,4 12,14.01 9,11.01" })
+        );
+
+        const AlertCircle = ({ className = "w-4 h-4" }) => React.createElement('svg', { className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
+            React.createElement('circle', { cx: 12, cy: 12, r: 10 }),
+            React.createElement('line', { x1: 12, y1: 8, x2: 12, y2: 12 }),
+            React.createElement('line', { x1: 12, y1: 16, x2: 12.01, y2: 16 })
+        );
+
+        const Edit2 = ({ className = "w-4 h-4" }) => React.createElement('svg', { className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
+            React.createElement('path', { d: "M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" })
+        );
+
+        const Save = ({ className = "w-4 h-4" }) => React.createElement('svg', { className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
+            React.createElement('path', { d: "M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" }),
+            React.createElement('polyline', { points: "17,21 17,13 7,13 7,21" }),
+            React.createElement('polyline', { points: "7,3 7,8 15,8" })
+        );
+
+        const X = ({ className = "w-4 h-4" }) => React.createElement('svg', { className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
+            React.createElement('line', { x1: 18, y1: 6, x2: 6, y2: 18 }),
+            React.createElement('line', { x1: 6, y1: 6, x2: 18, y2: 18 })
+        );
+
+        const PipelineScheduleTracker = () => {
+          const [activities, setActivities] = useState([
+            // Material Procurement Phase
+            { id: '1.0', name: 'MATERIAL PROCUREMENT PHASE', phase: 'procurement', quantity: '-', duration: 35, startDate: '2025-07-07', endDate: '2025-07-31', predecessor: '-', resources: '-', remarks: 'Extended for larger scope', isPhaseHeader: true, progress: 0 },
+            { id: '1.1', name: 'Procure 16" MS ERW Pipes (IS 3589, Grade 410)', phase: 'procurement', quantity: '960 RMT', duration: 30, startDate: '2025-07-07', endDate: '2025-07-28', predecessor: '-', resources: 'Procurement Team', remarks: '80 pieces × 12m, TATA/JINDAL/SAIL', progress: 0 },
+            { id: '1.2', name: 'Procure CS Bends (1.5D, 3D, 5D)', phase: 'procurement', quantity: '15 Nos', duration: 25, startDate: '2025-07-07', endDate: '2025-07-24', predecessor: '-', resources: 'Procurement Team', remarks: '5 each type, Schedule 40', progress: 0 },
+            { id: '1.3', name: 'Procure Welding Consumables (7018 Electrodes)', phase: 'procurement', quantity: 'As reqd', duration: 10, startDate: '2025-07-07', endDate: '2025-07-13', predecessor: '-', resources: 'Procurement Team', remarks: 'For 95 joints + bends', progress: 0 },
+            { id: '1.4', name: 'Procure Coating Materials (Pypstik Primer & IWL Tape)', phase: 'procurement', quantity: '1293.15 m²', duration: 20, startDate: '2025-07-07', endDate: '2025-07-20', predecessor: '-', resources: 'Procurement Team', remarks: '4mm thick tape, IS 10221', progress: 0 },
+            { id: '1.5', name: 'Procure RCC Materials (M30 Concrete)', phase: 'procurement', quantity: '45 m³', duration: 15, startDate: '2025-07-16', endDate: '2025-07-26', predecessor: '-', resources: 'Procurement Team', remarks: 'For road crossings', progress: 0 },
+            { id: '1.6', name: 'Procure WMM Materials', phase: 'procurement', quantity: '67.5 m³', duration: 15, startDate: '2025-07-21', endDate: '2025-07-31', predecessor: '-', resources: 'Procurement Team', remarks: 'Crushed aggregates', progress: 0 },
+            
+            // Mobilization Phase
+            { id: '2.0', name: 'MOBILIZATION & SITE PREPARATION', phase: 'mobilization', quantity: '-', duration: 10, startDate: '2025-07-29', endDate: '2025-08-04', predecessor: '1.3', resources: '-', remarks: 'Extended for larger site', isPhaseHeader: true, progress: 0 },
+            { id: '2.1', name: 'Equipment Mobilization', phase: 'mobilization', quantity: '-', duration: 4, startDate: '2025-07-29', endDate: '2025-07-31', predecessor: '1.3', resources: 'Transport Team', remarks: 'Multiple hydras, excavators', progress: 0 },
+            { id: '2.2', name: 'Site Office & Storage Setup (Multiple Locations)', phase: 'mobilization', quantity: '-', duration: 3, startDate: '2025-07-31', endDate: '2025-08-02', predecessor: '2.1', resources: 'Site Team (8)', remarks: 'Main & satellite yards', progress: 0 },
+            { id: '2.3', name: 'Safety Setup & Road Crossing Permits', phase: 'mobilization', quantity: '-', duration: 3, startDate: '2025-08-03', endDate: '2025-08-04', predecessor: '2.2', resources: 'Safety Officer', remarks: '3 road crossing permits', progress: 0 },
+            
+            // Pipeline Installation Phase
+            { id: '6.0', name: 'NEW PIPELINE INSTALLATION', phase: 'pipeline', quantity: '960 RMT', duration: 45, startDate: '2025-08-31', endDate: '2025-10-02', predecessor: '4.1FS+10d,5.1', resources: '-', remarks: 'BOQ Item 2', isPhaseHeader: true, progress: 0 },
+            { id: '6.1', name: 'Pipe Stringing - Section 1', phase: 'pipeline', quantity: '320 RMT', duration: 5, startDate: '2025-08-31', endDate: '2025-09-03', predecessor: '4.1FS+10d,5.1', resources: '2 Hydras, Labor (10)', remarks: 'Progressive with excavation', progress: 0 },
+            { id: '6.4', name: 'Joint Preparation & Fit-up (Progressive)', phase: 'pipeline', quantity: '80 joints', duration: 12, startDate: '2025-09-03', endDate: '2025-09-11', predecessor: '6.1FS+5d', resources: 'Fitters (8)', remarks: 'Critical Path', isCritical: true, progress: 0 },
+            { id: '6.5', name: 'TIG Root Welding (Progressive)', phase: 'pipeline', quantity: '80 joints', duration: 20, startDate: '2025-09-05', endDate: '2025-09-19', predecessor: '6.4SS+2d', resources: 'TIG Welders (6)', remarks: 'Critical Path', isCritical: true, progress: 0 },
+            
+            // Testing Phase
+            { id: '11.0', name: 'HYDROSTATIC TESTING', phase: 'testing', quantity: '960 RMT', duration: 10, startDate: '2025-10-14', endDate: '2025-10-21', predecessor: '8.7', resources: '-', remarks: 'BOQ Item 6', isPhaseHeader: true, progress: 0 },
+            { id: '11.3', name: 'Pressure Testing & Hold', phase: 'testing', quantity: '24 hrs', duration: 2, startDate: '2025-10-18', endDate: '2025-10-19', predecessor: '11.2', resources: 'Test Team (4)', remarks: '1.5x design pressure', isCritical: true, progress: 0 },
+            
+            // Final Activities
+            { id: '12.0', name: 'FINAL ACTIVITIES & HANDOVER', phase: 'demob', quantity: '-', duration: 8, startDate: '2025-10-31', endDate: '2025-11-06', predecessor: '10.5,11.4', resources: '-', remarks: 'Project Completion', isPhaseHeader: true, progress: 0 },
+            { id: '12.4', name: 'Equipment Demobilization & Handover', phase: 'demob', quantity: '-', duration: 2, startDate: '2025-11-05', endDate: '2025-11-06', predecessor: '12.3FS-1d', resources: 'All Teams', remarks: 'Project End', isCritical: true, progress: 0 }
+          ]);
+
+          const [projectStats, setProjectStats] = useState({
+            totalActivities: 0,
+            completedActivities: 0,
+            inProgressActivities: 0,
+            overallProgress: 0
+          });
+
+          useEffect(() => {
+            const totalActivities = activities.filter(a => !a.isPhaseHeader).length;
+            const completedActivities = activities.filter(a => !a.isPhaseHeader && a.progress === 100).length;
+            const inProgressActivities = activities.filter(a => !a.isPhaseHeader && a.progress > 0 && a.progress < 100).length;
+            const overallProgress = Math.round((activities.reduce((sum, a) => sum + (a.isPhaseHeader ? 0 : a.progress), 0) / totalActivities) || 0);
+            
+            setProjectStats({
+              totalActivities,
+              completedActivities,
+              inProgressActivities,
+              overallProgress
+            });
+          }, [activities]);
+
+          const phaseColors = {
+            procurement: 'bg-blue-100 border-blue-300',
+            mobilization: 'bg-indigo-100 border-indigo-300',
+            removal: 'bg-red-100 border-red-300',
+            earthwork: 'bg-yellow-100 border-yellow-300',
+            pipeline: 'bg-green-100 border-green-300',
+            bends: 'bg-purple-100 border-purple-300',
+            coating: 'bg-violet-100 border-violet-300',
+            testing: 'bg-blue-200 border-blue-400',
+            civil: 'bg-pink-100 border-pink-300',
+            road: 'bg-orange-100 border-orange-300',
+            demob: 'bg-gray-100 border-gray-300'
+          };
+
+          const updateActivity = (id, field, value) => {
+            setActivities(prev => prev.map(activity => 
+              activity.id === id ? { ...activity, [field]: value } : activity
+            ));
+          };
+
+          const calculateEndDate = (startDate, duration) => {
+            const start = new Date(startDate);
+            const end = new Date(start);
+            end.setDate(start.getDate() + duration - 1);
+            return end.toISOString().split('T')[0];
+          };
+
+          const handleDurationChange = (id, newDuration) => {
+            const activity = activities.find(a => a.id === id);
+            if (activity) {
+              const newEndDate = calculateEndDate(activity.startDate, newDuration);
+              setActivities(prev => prev.map(a => 
+                a.id === id ? { ...a, duration: newDuration, endDate: newEndDate } : a
+              ));
+            }
+          };
+
+          const handleStartDateChange = (id, newStartDate) => {
+            const activity = activities.find(a => a.id === id);
+            if (activity) {
+              const newEndDate = calculateEndDate(newStartDate, activity.duration);
+              setActivities(prev => prev.map(a => 
+                a.id === id ? { ...a, startDate: newStartDate, endDate: newEndDate } : a
+              ));
+            }
+          };
+
+          const getStatusIcon = (progress) => {
+            if (progress === 100) return React.createElement(CheckCircle, { className: "w-4 h-4 text-green-600" });
+            if (progress > 0) return React.createElement(Clock, { className: "w-4 h-4 text-blue-600" });
+            return React.createElement(AlertCircle, { className: "w-4 h-4 text-gray-400" });
+          };
+
+          const EditableCell = ({ value, onSave, type = 'text' }) => {
+            const [isEditing, setIsEditing] = useState(false);
+            const [editValue, setEditValue] = useState(value);
+
+            const handleSave = () => {
+              onSave(type === 'number' ? parseInt(editValue) : editValue);
+              setIsEditing(false);
+            };
+
+            const handleCancel = () => {
+              setEditValue(value);
+              setIsEditing(false);
+            };
+
+            if (isEditing) {
+              return React.createElement('div', { className: "flex items-center gap-1" },
+                React.createElement('input', {
+                  type: type,
+                  value: editValue,
+                  onChange: (e) => setEditValue(e.target.value),
+                  className: "w-full px-2 py-1 text-xs border rounded",
+                  onKeyPress: (e) => e.key === 'Enter' && handleSave()
+                }),
+                React.createElement('button', {
+                  onClick: handleSave,
+                  className: "p-1 text-green-600 hover:bg-green-100 rounded"
+                }, React.createElement(Save, { className: "w-3 h-3" })),
+                React.createElement('button', {
+                  onClick: handleCancel,
+                  className: "p-1 text-red-600 hover:bg-red-100 rounded"
+                }, React.createElement(X, { className: "w-3 h-3" }))
+              );
+            }
+
+            return React.createElement('div', { className: "flex items-center gap-1 group" },
+              React.createElement('span', { className: "text-xs" }, value),
+              React.createElement('button', {
+                onClick: () => setIsEditing(true),
+                className: "opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 rounded"
+              }, React.createElement(Edit2, { className: "w-3 h-3" }))
+            );
+          };
+
+          return React.createElement('div', { className: "max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen" },
+            // Header
+            React.createElement('div', { className: "bg-blue-900 text-white p-6 rounded-t-lg" },
+              React.createElement('h1', { className: "text-xl font-bold mb-2" }, "ADANI KRISHNAPATNAM PORT LTD."),
+              React.createElement('h2', { className: "text-sm mb-4 text-blue-100" }, "Maintenance of Santhoshimatha MS Oil Pipeline at Zero Point - Dynamic Schedule"),
+              
+              React.createElement('div', { className: "grid grid-cols-4 gap-4 text-sm" },
+                React.createElement('div', null,
+                  React.createElement('span', { className: "text-blue-200 text-xs uppercase" }, "Project Start"),
+                  React.createElement('div', { className: "font-semibold" }, "July 7, 2025")
+                ),
+                React.createElement('div', null,
+                  React.createElement('span', { className: "text-blue-200 text-xs uppercase" }, "Project End"),
+                  React.createElement('div', { className: "font-semibold" }, "November 06, 2025")
+                ),
+                React.createElement('div', null,
+                  React.createElement('span', { className: "text-blue-200 text-xs uppercase" }, "Total Duration"),
+                  React.createElement('div', { className: "font-semibold" }, "122 Days (~4.1 Months)")
+                ),
+                React.createElement('div', null,
+                  React.createElement('span', { className: "text-blue-200 text-xs uppercase" }, "Pipeline Length"),
+                  React.createElement('div', { className: "font-semibold" }, "960 RMT (16\" Dia)")
+                )
+              )
+            ),
+
+            // Project Stats Dashboard
+            React.createElement('div', { className: "bg-white border-x border-gray-200 p-4" },
+              React.createElement('div', { className: "grid grid-cols-4 gap-4 mb-4" },
+                React.createElement('div', { className: "bg-blue-50 p-3 rounded-lg" },
+                  React.createElement('div', { className: "flex items-center gap-2" },
+                    React.createElement(Clock, { className: "w-5 h-5 text-blue-600" }),
+                    React.createElement('span', { className: "text-sm font-medium" }, "Overall Progress")
+                  ),
+                  React.createElement('div', { className: "text-2xl font-bold text-blue-600" }, `${projectStats.overallProgress}%`)
+                ),
+                React.createElement('div', { className: "bg-green-50 p-3 rounded-lg" },
+                  React.createElement('div', { className: "flex items-center gap-2" },
+                    React.createElement(CheckCircle, { className: "w-5 h-5 text-green-600" }),
+                    React.createElement('span', { className: "text-sm font-medium" }, "Completed")
+                  ),
+                  React.createElement('div', { className: "text-2xl font-bold text-green-600" }, projectStats.completedActivities)
+                ),
+                React.createElement('div', { className: "bg-yellow-50 p-3 rounded-lg" },
+                  React.createElement('div', { className: "flex items-center gap-2" },
+                    React.createElement(AlertCircle, { className: "w-5 h-5 text-yellow-600" }),
+                    React.createElement('span', { className: "text-sm font-medium" }, "In Progress")
+                  ),
+                  React.createElement('div', { className: "text-2xl font-bold text-yellow-600" }, projectStats.inProgressActivities)
+                ),
+                React.createElement('div', { className: "bg-gray-50 p-3 rounded-lg" },
+                  React.createElement('div', { className: "flex items-center gap-2" },
+                    React.createElement(Users, { className: "w-5 h-5 text-gray-600" }),
+                    React.createElement('span', { className: "text-sm font-medium" }, "Total Activities")
+                  ),
+                  React.createElement('div', { className: "text-2xl font-bold text-gray-600" }, projectStats.totalActivities)
+                )
+              ),
+              
+              // Overall Progress Bar
+              React.createElement('div', { className: "w-full bg-gray-200 rounded-full h-3" },
+                React.createElement('div', { 
+                  className: "bg-blue-600 h-3 rounded-full transition-all duration-300",
+                  style: { width: `${projectStats.overallProgress}%` }
+                })
+              )
+            ),
+
+            // Schedule Table
+            React.createElement('div', { className: "bg-white rounded-b-lg border border-gray-200 overflow-hidden" },
+              React.createElement('div', { className: "overflow-x-auto" },
+                React.createElement('table', { className: "w-full text-xs" },
+                  React.createElement('thead', { className: "bg-blue-800 text-white sticky top-0" },
+                    React.createElement('tr', null,
+                      React.createElement('th', { className: "px-3 py-2 text-left" }, "ID"),
+                      React.createElement('th', { className: "px-3 py-2 text-left min-w-64" }, "Activity Description"),
+                      React.createElement('th', { className: "px-3 py-2 text-left" }, "Quantity"),
+                      React.createElement('th', { className: "px-3 py-2 text-left" }, "Duration"),
+                      React.createElement('th', { className: "px-3 py-2 text-left" }, "Start Date"),
+                      React.createElement('th', { className: "px-3 py-2 text-left" }, "End Date"),
+                      React.createElement('th', { className: "px-3 py-2 text-left" }, "Progress"),
+                      React.createElement('th', { className: "px-3 py-2 text-left" }, "Status"),
+                      React.createElement('th', { className: "px-3 py-2 text-left" }, "Resources"),
+                      React.createElement('th', { className: "px-3 py-2 text-left" }, "Remarks")
+                    )
+                  ),
+                  React.createElement('tbody', null,
+                    activities.map((activity) => 
+                      React.createElement('tr', { 
+                        key: activity.id,
+                        className: `border-b border-gray-100 hover:bg-gray-50 transition-all duration-500 ${
+                          activity.isPhaseHeader 
+                            ? 'bg-gray-100 font-semibold' 
+                            : phaseColors[activity.phase]
+                        } ${activity.isCritical ? 'border-l-4 border-red-500' : ''}`
+                      },
+                        React.createElement('td', { className: "px-3 py-2 font-semibold text-blue-800" }, activity.id),
+                        React.createElement('td', { 
+                          className: `px-3 py-2 ${activity.isPhaseHeader ? 'font-bold' : 'pl-6'}`
+                        }, activity.name),
+                        React.createElement('td', { className: "px-3 py-2 text-green-700 font-medium" }, activity.quantity),
+                        React.createElement('td', { className: "px-3 py-2" },
+                          activity.isPhaseHeader ? 
+                            React.createElement('span', { className: "text-center" }, activity.duration) :
+                            React.createElement(EditableCell, { 
+                              value: activity.duration, 
+                              onSave: (newDuration) => handleDurationChange(activity.id, newDuration),
+                              type: "number"
+                            })
+                        ),
+                        React.createElement('td', { className: "px-3 py-2" },
+                          activity.isPhaseHeader ? 
+                            React.createElement('span', { className: "text-xs" }, new Date(activity.startDate).toLocaleDateString()) :
+                            React.createElement(EditableCell, { 
+                              value: activity.startDate, 
+                              onSave: (newStartDate) => handleStartDateChange(activity.id, newStartDate),
+                              type: "date"
+                            })
+                        ),
+                        React.createElement('td', { className: "px-3 py-2 text-xs" }, new Date(activity.endDate).toLocaleDateString()),
+                        React.createElement('td', { className: "px-3 py-2" },
+                          !activity.isPhaseHeader && React.createElement('div', { className: "flex items-center gap-2" },
+                            React.createElement('input', {
+                              type: "range",
+                              min: "0",
+                              max: "100",
+                              value: activity.progress,
+                              onChange: (e) => updateActivity(activity.id, 'progress', parseInt(e.target.value)),
+                              className: "w-16 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                            }),
+                            React.createElement('span', { className: "text-xs font-medium min-w-8" }, `${activity.progress}%`)
+                          )
+                        ),
+                        React.createElement('td', { className: "px-3 py-2" },
+                          !activity.isPhaseHeader && getStatusIcon(activity.progress)
+                        ),
+                        React.createElement('td', { className: "px-3 py-2 text-xs" }, activity.resources),
+                        React.createElement('td', { className: "px-3 py-2 text-xs" },
+                          React.createElement('span', { 
+                            className: activity.isCritical ? 'text-red-600 font-semibold' : ''
+                          }, activity.remarks)
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            ),
+
+            // Legend
+            React.createElement('div', { className: "mt-4 bg-white p-4 rounded-lg border border-gray-200" },
+              React.createElement('h3', { className: "font-semibold mb-3 text-sm" }, "Phase Legend"),
+              React.createElement('div', { className: "grid grid-cols-3 gap-3 text-xs" },
+                Object.entries(phaseColors).map(([phase, color]) =>
+                  React.createElement('div', { key: phase, className: "flex items-center gap-2" },
+                    React.createElement('div', { className: `w-4 h-4 rounded ${color}` }),
+                    React.createElement('span', { className: "capitalize" }, phase.replace(/([A-Z])/g, ' $1').trim())
+                  )
+                )
+              ),
+              React.createElement('div', { className: "mt-3 pt-3 border-t border-gray-200" },
+                React.createElement('p', { className: "text-xs text-gray-600" },
+                  React.createElement('span', { className: "font-semibold" }, "Critical Path Activities:"),
+                  " Activities with red left border are on the critical path. Any delay will directly impact project completion. ",
+                  React.createElement('span', { className: "font-semibold ml-2" }, "Interactive Features:"),
+                  " Click edit icons to modify dates and durations. Use progress sliders to update completion status."
+                )
+              )
+            )
+          );
+        };
+
+        // Render the component
+        ReactDOM.render(React.createElement(PipelineScheduleTracker), document.getElementById('root'));
     </script>
 </body>
 </html>
